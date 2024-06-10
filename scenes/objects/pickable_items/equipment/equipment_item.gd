@@ -16,6 +16,9 @@ signal used_unload()
 @export var normal_pos_path : NodePath
 @export var throw_pos_path : NodePath
 
+@export_subgroup("Stacking")
+@export var stackable_resource: StackableResource = null
+
 var is_in_belt = false
 
 @onready var hold_position = %HoldPosition
