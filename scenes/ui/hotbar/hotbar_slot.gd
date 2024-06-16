@@ -151,8 +151,8 @@ func update_name():
 	if item == null:
 		item_name_label.text = ""
 	else:
-		if item.stackable_resource != null:
-			item_name_label.text = item.item_name + "(" + str(item.stackable_resource.items_stacked.size()) + ")"
+		if item.stackable_resource != null and item.stackable_resource.items_stacked.size() > 1:
+			item_name_label.text = item.stackable_resource.stack_name + " " + str(item.stackable_resource.items_stacked.size()) + "x"
 			pass
 		else:
 			item_name_label.text = item.item_name

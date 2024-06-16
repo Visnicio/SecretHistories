@@ -30,8 +30,6 @@ func _ready():
 		hold_position.rotation_degrees.z = 90
 		
 	connect("body_entered", Callable(self, "play_drop_sound"))
-	if stackable_resource:
-		print("MY FUCKING STACK IS " + stackable_resource.stack_name)
 
 
 ## WORKAROUND for https://github.com/godotengine/godot/issues/62435
@@ -58,12 +56,16 @@ func apply_throw_logic():
 # Override this function for (Left-Click and E, typically) use actions
 func _use_primary():
 	print("use primary")
+	if stackable_resource != null:
+		stackable_resource.items_stacked.pop_front()
 	pass
 
 
 # Right-click, typically
 func _use_secondary():
 	print("use secondary")
+	if stackable_resource != null:
+		stackable_resource.items_stacked.pop_front()
 	pass
 
 
