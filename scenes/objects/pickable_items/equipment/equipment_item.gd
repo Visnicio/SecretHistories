@@ -1,4 +1,3 @@
-@tool
 class_name EquipmentItem
 extends PickableItem
 
@@ -17,7 +16,7 @@ signal used_unload()
 @export var throw_pos_path : NodePath
 
 @export_subgroup("Stacking")
-@export var stackable_resource: StackableResource = null
+@export var stackable_resource: StackableResource
 
 var is_in_belt = false
 
@@ -31,6 +30,8 @@ func _ready():
 		hold_position.rotation_degrees.z = 90
 		
 	connect("body_entered", Callable(self, "play_drop_sound"))
+	if stackable_resource:
+		print("MY FUCKING STACK IS " + stackable_resource.stack_name)
 
 
 ## WORKAROUND for https://github.com/godotengine/godot/issues/62435
@@ -99,3 +100,10 @@ func use_unload():
 
 func get_hold_transform() -> Transform3D:
 	return $HoldPosition.transform
+
+
+func stack_drop_logic() -> void:
+	# TODO - select the next item of the stack and equip
+	
+	# TODO - remove the object from the stack
+	pass

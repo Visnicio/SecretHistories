@@ -111,6 +111,8 @@ func add_item(item : PickableItem) -> bool:
 	
 	elif item is EquipmentItem:
 		print("item is equipment item")
+		if item.stackable_resource:
+			print("it has a stack")
 		# Update the inventory info immediately
 		# This is a bulky item, or there is no space on the hotbar
 		if item.item_size == GlobalConsts.ItemSize.SIZE_BULKY or !hotbar.has(null):
@@ -119,7 +121,25 @@ func add_item(item : PickableItem) -> bool:
 			unequip_offhand_item()
 			equip_bulky_item(item)
 		else:
-			var slot = 0
+			# Before anything, check if the item can be stacked on anything in the hotbar
+			for hotbar_item: EquipmentItem in hotbar:
+				if hotbar_item and hotbar_item.stackable_resource != null and hotbar_item.stackable_resource.stack_name == item.stackable_resource.stack_name:
+					print("the item can stack with: " + hotbar_item.name)
+					if hotbar_item.stackable_resource.items_stacked.size() == hotbar_item.stackable_resource.max_stack:
+						print("... but its at full capacity rn")
+					else:
+						print("Hurray! Stacking boois")
+						hotbar_item.stackable_resource.add_item(item)
+						# Schedule the item removal from the world
+						if item.is_inside_tree():
+							item.get_parent().remove_child(item)
+						
+						#emit_signal("hotbar_changed", slot) # TODO - verify the params I need to pass
+						emit_signal("inventory_changed")
+						return true
+				pass
+			
+			var slot: int = 0
 			
 			### Probably can be cleaned up - part 1 is to put lights offhand, part 2 is everything else
 			### Part 1 - Checks if something is in offhand; if not, and this is a light, put it in offhand
@@ -154,6 +174,12 @@ func add_item(item : PickableItem) -> bool:
 			slot = current_mainhand_slot
 			# Then the offhand, preferring this slot for lights
 			if hotbar[slot] != null:
+				
+				#var current_equipped_item: EquipmentItem = hotbar[slot] as EquipmentItem
+				#if current_equipped_item.stackable_resource != null and current_equipped_item.stackable_resource == item.stackable_resource: #checks if the current mainhand item is stackable
+					#print("the item can be stacked with the mainhand item")
+				#else:
+				
 				print("Current hotbar slot, ", slot + 1, " is null. Setting slot to current offhand slot")
 				slot = current_offhand_slot
 			# Then the first empty slot
@@ -162,6 +188,8 @@ func add_item(item : PickableItem) -> bool:
 			# This checks if the slot to add the item isn't the hands-free slot then adds the item to the slot
 			if slot != 10:
 				hotbar[slot] = item
+				if item.stackable_resource != null:
+					item.stackable_resource.add_item(item)
 				# Schedule the item removal from the world
 				if item.is_inside_tree():
 					item.get_parent().remove_child(item)
