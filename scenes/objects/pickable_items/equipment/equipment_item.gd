@@ -100,10 +100,3 @@ func use_unload():
 
 func get_hold_transform() -> Transform3D:
 	return $HoldPosition.transform
-
-
-func stack_drop_logic() -> void:
-	# TODO - select the next item of the stack and equip
-	
-	# TODO - remove the object from the stack
-	pass
