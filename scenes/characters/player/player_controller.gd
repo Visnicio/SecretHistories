@@ -10,11 +10,11 @@ var is_player_moving : bool = false
 
 @export var max_placement_distance = 1.5
 @export var hold_time_to_place = 0.4
-@export var throw_strength : float = 20
+@export var throw_strength : float = 0.0
 const ON_GRAB_MAX_SPEED : float = 0.1
 
 @export var hold_time_to_grab : float = 0.4
-@export var grab_strength : float = 1000.0
+@export var grab_strength : float = 40.0
 
 #export var grab_spring_distance : float = 0.1
 #export var grab_damping : float = 0.2
@@ -49,6 +49,7 @@ var throw_item_hand : int = ItemSelection.ITEM_MAINHAND
 var throw_item : EquipmentItem
 var throw_press_length : float = 0.0
 var _placing_blueprint: RigidBody3D = null # A copy of the player's item that he is trying to drop
+var should_place_blueprint_shader : ShaderMaterial = load("res://resources/shaders/blueprints/blueprint.tres")
 
 @export var crouch_rate = 0.08 # (float, 0.05, 1.0)
 @export var crawl_rate = 0.5 # (float, 0.1, 1.0)
@@ -114,6 +115,11 @@ var clamberable_obj : RigidBody3D
 var item_up = false
 var camera_movement_resistance : float = 1.0
 
+# Use item tap or hold timer
+var _mainhand_use_item_hold_timer : float = 0.0
+var _offhand_use_item_hold_timer : float = 0.0
+var _use_item_wait_time : float = 250 # 150-300 is recommended range to detect click versus hold
+
 # For tracking short or long press of cycle_offhand_slot
 var _cycle_offhand_timer : float = 0.0
 var _swap_hands_wait_time : float = 500
@@ -172,13 +178,13 @@ func _physics_process(delta : float):
 	_walk(delta)
 	_crouch()
 	handle_grab(delta)
+	_handle_use_items(delta)
 	_handle_inventory_and_grab_input(delta)
 	nightvision()
 	handle_screen_filters()
 	handle_binocs()
 	next_item()
 	previous_item()
-	drop_grabable()
 	empty_slot()
 	_clamber()
 	_cheats()
@@ -261,8 +267,10 @@ func _walk(delta) -> void:
 	character.state.move_direction = move_dir.normalized()
 	
 	# This logic has the player kick if they hit sprint and release it without moving
-	if Input.is_action_pressed("player|sprint"):
+	if Input.is_action_just_pressed("player|sprint"):
 		has_moved_after_pressing_sprint = false
+	
+	if Input.is_action_pressed("player|sprint"):
 		if is_movement_key1_held or is_movement_key2_held or is_movement_key3_held or is_movement_key4_held:
 			has_moved_after_pressing_sprint = true
 			owner.do_sprint = true
@@ -372,10 +380,6 @@ func handle_grab(delta : float):
 					grab_object.set_item_state(GlobalConsts.ItemState.DAMAGING)   # This is so any pickable_item collides with cultists
 					grab_object.check_item_state()
 	
-	# These are debug indicators for initial and current grab points
-	$GrabInitial.visible = false
-	$GrabCurrent.visible = false
-	
 	if is_grabbing:
 		var direct_state : PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(grab_object.get_rid())
 #		print("mass : ", direct_state.inverse_mass)
@@ -401,11 +405,12 @@ func handle_grab(delta : float):
 		# Slows down camera turn sensitivity to simulate moving something heavy
 		camera_movement_resistance = min(5 / grab_object.mass, 1)   # Camera goes nuts if you don't do this
 		
-		if $GrabInitial.global_transform.origin.distance_to($GrabCurrent.global_transform.origin) >= 0.3 and !grab_object is PickableItem:
+		if $GrabInitial.global_transform.origin.distance_to($GrabCurrent.global_transform.origin) >= 1:
 			is_grabbing = false
 			print("Grab broken by distance")
 			if grab_object is PickableItem:   # So not for plain RigidBodies or otherwise large objects
 				grab_object.set_item_state(GlobalConsts.ItemState.DROPPED)
+			last_interaction_target = null
 			interaction_handled = true
 			camera_movement_resistance = 1.0
 		
@@ -438,11 +443,127 @@ func handle_grab(delta : float):
 		
 		# Modify player's movement based on additional force
 			if owner.is_player_moving:
-				owner.velocity.x = additional_force.x * delta
-				owner.velocity.z = additional_force.z * delta
+				owner.velocity.x = additional_force.x * delta / 2
+				owner.velocity.z = additional_force.z * delta / 2
 		
 		# Limits the angular velocity to prevent some issues
 		direct_state.angular_velocity = direct_state.angular_velocity.normalized() * min(direct_state.angular_velocity.length(), 4.0)
+
+
+func _handle_use_items(delta : float):
+	# TODO: function this out to reduce repetition. Some of it will be cleaned out during the big melee issue #13
+	
+	# Mainhand
+	if is_instance_valid(character.inventory.get_mainhand_item()):
+		var mainhand_item = character.inventory.get_mainhand_item()
+		
+		if Input.is_action_just_pressed("playerhand|mainhand_use") and owner.is_reloading == false:
+			# Check if grace period has elapsed since loadscreen removed to avoid accidentally shooting after load
+			if no_click_after_load_period == false:
+				# Gun items are special since we want them to shoot on press, not release; other items, the small delay is fine
+				if mainhand_item is GunItem:
+					mainhand_item.use_primary()
+				# All other types of items use_primary on release, and use_secondary while held more than _use_item_wait_time
+				else:
+					_mainhand_use_item_hold_timer = Time.get_ticks_msec()
+		
+		if Input.is_action_pressed("playerhand|mainhand_use") and owner.is_reloading == false:
+			if _mainhand_use_item_hold_timer + _use_item_wait_time < Time.get_ticks_msec():
+				print("use_secondary active")
+				mainhand_item.use_secondary()
+				if mainhand_item is MeleeItem:
+					%AnimationTree.set("parameters/MeleeSpeed/scale", mainhand_item.melee_attack_speed)
+					%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 1)
+					%AnimationTree.set("parameters/MeleeThrust/active", true)
+					if owner.noise_level < 8:
+						owner.noise_level = 8
+				throw_state = ThrowState.IDLE
+		
+		if Input.is_action_just_released("playerhand|mainhand_use") and owner.is_reloading == false:
+			# GunItems use_primary on just_pressed
+			if !mainhand_item is GunItem:
+				# If it's been less than _use_item_wait_item, consider it a tap, so use_primary
+				if _mainhand_use_item_hold_timer + _use_item_wait_time > Time.get_ticks_msec():
+					if mainhand_item:
+						print("use primary")
+						mainhand_item.use_primary()
+						if mainhand_item is MeleeItem:
+							%AnimationTree.set("parameters/MeleeSpeed/scale", mainhand_item.melee_attack_speed)
+							%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 1)
+							%AnimationTree.set("parameters/MeleeChop1/active", true)
+							if owner.noise_level < 8:
+								owner.noise_level = 8
+						throw_state = ThrowState.IDLE
+			
+			_mainhand_use_item_hold_timer = 0.0
+	
+	### RELOADING
+	# Start timer to check if want to reload or unload
+	if Input.is_action_just_pressed("player|reload"):
+		if character.inventory.get_mainhand_item():
+			_reload_press_timer = Time.get_ticks_msec()
+			
+	if Input.is_action_just_released("player|reload"):
+		if character.inventory.get_mainhand_item():
+			if _reload_press_timer + _unload_wait_time < Time.get_ticks_msec():
+				if _reload_press_timer == 0.0:
+					return
+				# Player intends to unload not reload
+				character.inventory.get_mainhand_item().use_unload()
+				throw_state = ThrowState.IDLE
+				_reload_press_timer = 0.0
+				return
+			else:
+				_reload_press_timer = 0.0
+				
+			character.inventory.get_mainhand_item().use_reload()
+			throw_state = ThrowState.IDLE
+	
+	# Offhand
+	if is_instance_valid(character.inventory.get_offhand_item()):
+		var offhand_item = character.inventory.get_offhand_item()
+		
+		if Input.is_action_just_pressed("playerhand|offhand_use") and owner.is_reloading == false:
+			# Check if grace period has elapsed since loadscreen removed to avoid accidentally shooting after load
+			if no_click_after_load_period == false:
+				# Gun items are special since we want them to shoot on press, not release; other items, the small delay is fine
+				if offhand_item is GunItem:
+					offhand_item.use_primary()
+				# All other types of items use_primary on release, and use_secondary while held more than _use_item_wait_time
+				else:
+					_offhand_use_item_hold_timer = Time.get_ticks_msec()
+		
+		if Input.is_action_pressed("playerhand|offhand_use") and owner.is_reloading == false:
+			if _offhand_use_item_hold_timer + _use_item_wait_time < Time.get_ticks_msec():
+				print("use_secondary active")
+				offhand_item.use_secondary()
+				if offhand_item is MeleeItem:
+					%AnimationTree.set("parameters/MeleeSpeed/scale", offhand_item.melee_attack_speed)
+					%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 1)
+					%AnimationTree.set("parameters/MeleeThrust/active", true)
+					if owner.noise_level < 8:
+						owner.noise_level = 8
+				throw_state = ThrowState.IDLE
+		
+		if Input.is_action_just_released("playerhand|offhand_use") and owner.is_reloading == false:
+			# GunItems use_primary on just_pressed
+			if !offhand_item is GunItem:
+				# If it's been less than _use_item_wait_item, consider it a tap, so use_primary
+				if _offhand_use_item_hold_timer + _use_item_wait_time > Time.get_ticks_msec():
+					if offhand_item:
+						print("use primary")
+						offhand_item.use_primary()
+						if offhand_item is MeleeItem:
+							%AnimationTree.set("parameters/MeleeSpeed/scale", offhand_item.melee_attack_speed)
+							%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 1)
+							%AnimationTree.set("parameters/MeleeChop1L/active", true) # doesn't currently exist
+							if owner.noise_level < 8:
+								owner.noise_level = 8
+						throw_state = ThrowState.IDLE
+			
+			_offhand_use_item_hold_timer = 0.0
+	
+	update_throw_state(throw_item, delta)
 
 
 func _handle_inventory_and_grab_input(delta : float):
@@ -520,69 +641,6 @@ func _handle_inventory_and_grab_input(delta : float):
 			last_holstered_mainhand_slotnum = 10 # empty hands slot
 			last_holstered_offhand_slotnum = 10 # empty hands slot
 	
-	# Item Usage
-	# temporary hack (issue #409)
-	if is_instance_valid(character.inventory.get_mainhand_item()):
-	
-		if Input.is_action_just_pressed("playerhand|main_use_primary"):
-			# Check if grace period has elapsed since loadscreen removed to avoid accidentally shooting after load
-			if no_click_after_load_period == false:
-				if character.inventory.get_mainhand_item():
-					character.inventory.get_mainhand_item().use_primary()
-					if character.inventory.get_mainhand_item() is MeleeItem:
-						%AnimationTree.set("parameters/MeleeSpeed/scale", character.inventory.get_mainhand_item().melee_attack_speed)
-						%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 1)
-						%AnimationTree.set("parameters/MeleeThrust/active", true)
-						if owner.noise_level < 8:
-							owner.noise_level = 8
-					throw_state = ThrowState.IDLE
-	
-		if Input.is_action_just_pressed("playerhand|main_use_secondary"):
-			if character.inventory.get_mainhand_item() and !interaction_target is PickableItem and !interaction_target is Interactable: 
-				character.inventory.get_mainhand_item().use_secondary()
-				if character.inventory.get_mainhand_item() is MeleeItem:
-					%AnimationTree.set("parameters/MeleeSpeed/scale", character.inventory.get_mainhand_item().melee_attack_speed)
-					%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 1)
-					%AnimationTree.set("parameters/MeleeChop1/active", true)
-					if owner.noise_level < 8:
-						owner.noise_level = 10
-				throw_state = ThrowState.IDLE
-	
-	# Start timer to check if want to reload or unload
-	if Input.is_action_just_pressed("player|reload"):
-		if character.inventory.get_mainhand_item():
-			_reload_press_timer = Time.get_ticks_msec()
-			
-	if Input.is_action_just_released("player|reload"):
-		if character.inventory.get_mainhand_item():
-			
-			if _reload_press_timer + _unload_wait_time < Time.get_ticks_msec():
-				if _reload_press_timer == 0.0:
-					return
-				# Player intends to unload not reload
-				character.inventory.get_mainhand_item().use_unload()
-				throw_state = ThrowState.IDLE
-				_reload_press_timer = 0.0
-				return
-			
-			else:
-				_reload_press_timer = 0.0
-				
-			character.inventory.get_mainhand_item().use_reload()
-			throw_state = ThrowState.IDLE
-		
-	if Input.is_action_just_pressed("playerhand|offhand_use") and owner.is_reloading == false:
-		if character.inventory.get_offhand_item():
-			# TODO: implement hold key for use_secondary (but do not ADS)
-			character.inventory.get_offhand_item().use_primary()
-			if character.inventory.get_offhand_item() is MeleeItem:
-				%AnimationTree.set("parameters/MeleeSpeed/scale", character.inventory.get_offhand_item().melee_attack_speed)
-				%AnimationTree.set("parameters/OffHand_MainHand_Blend/blend_amount", 0)
-				%AnimationTree.set("parameters/MeleeThrustL/active", true)
-			throw_state = ThrowState.IDLE
-	
-	update_throw_state(throw_item, delta)
-	
 	if is_grabbing:
 		wanna_grab = true
 	else:
@@ -592,10 +650,9 @@ func _handle_inventory_and_grab_input(delta : float):
 			last_interaction_target = interaction_target
 	if !Input.is_action_pressed("player|interact"): # This is another way to ensure not grabbing without interact pressed. Fixes bug #564
 		stop_grabbing()
-	if Input.is_action_pressed("player|interact"):   # TODO: when RigidBody doors are back, reinclude:  or Input.is_action_pressed("playerhand|main_use_secondary"):
-#		# TODO: if on_fire: put out fire
-#		# TODO: elif in_close_eyes_area: close eyes
-#		# TODO: elif in_hold_breath_area: hold breath
+	if Input.is_action_pressed("player|interact"):
+#		# TODO: if on_fire: put out fire (can't do any other interact action along with this)
+#		# TODO: elif in dusty/smoky/gassy: hold breath
 		
 		if last_interaction_target and is_grabbing == false:
 			grab_press_length += delta
@@ -629,6 +686,7 @@ func _handle_inventory_and_grab_input(delta : float):
 			elif character.inventory.current_mainhand_slot != null:
 				if character.inventory.current_mainhand_equipment is GunItem == true:
 					character.player_animations.end_ads()
+		
 		# TODO: If nothing else covered, interact zooms slightly
 	
 	if Input.is_action_just_released("player|interact"):
@@ -651,7 +709,6 @@ func _handle_inventory_and_grab_input(delta : float):
 func _handle_hotbar_buttons():
 	#printt(slot_pressed, number_of_hotbar_buttons_pressed)
 	
-	# if just pressed:
 	for i in range(character.inventory.HOTBAR_SIZE - 1):
 		if Input.is_action_just_pressed("hotbar_%d" % [i + 1]) and owner.is_reloading == false:
 			# track number of buttons pressed to make sure we don't switch items after swapping, while still holding first button
@@ -661,7 +718,6 @@ func _handle_hotbar_buttons():
 				character.inventory.swap_slots(slot_pressed, i)
 				#return
 	
-	# if released 
 	for i in range(character.inventory.HOTBAR_SIZE - 1):
 		if Input.is_action_just_released("hotbar_%d" % [i + 1]) and owner.is_reloading == false:
 			# did we swap slots?
@@ -677,22 +733,12 @@ func _handle_hotbar_buttons():
 				# clear which slot was pressed (could do double-duty as are we swapping?)
 				slot_pressed = -1 # invalid slot
 	
-	# if pressed
 	for i in range(character.inventory.HOTBAR_SIZE - 1):
 		if Input.is_action_pressed("hotbar_%d" % [i + 1]) and owner.is_reloading == false:
 			# if didn't just swap:
 			if slot_pressed == -1:
 				# record which slot was pressed
 				slot_pressed = i
-	
-	## Main-hand slot selection
-	#for i in range(character.inventory.HOTBAR_SIZE - 1):
-		#if Input.is_action_just_pressed("hotbar_%d" % [i + 1]) and owner.is_reloading == false:
-			## Don't select current offhand slot and don't select 10 because it's hotbar_11, used for holstering offhand item, below
-			#if i != character.inventory.current_offhand_slot and i != 10:
-				#character.inventory.drop_bulky_item()
-				#character.inventory.current_mainhand_slot = i
-				#throw_state = ThrowState.IDLE
 
 
 func stop_grabbing():
@@ -708,9 +754,9 @@ func stop_grabbing():
 	camera_movement_resistance = 1.0   # In case of a grab-throw, make sure the camera turning still isn't slowed
 
 
-func drop_grabable():
+func update_throw_state(throw_item : EquipmentItem, delta : float):
 	# When the drop button or keys are pressed, grabable objects are released
-	if Input.is_action_just_pressed("playerhand|main_throw") or Input.is_action_just_pressed("playerhand|offhand_throw"):
+	if Input.is_action_just_pressed("playerhand|mainhand_throw") or Input.is_action_just_pressed("playerhand|offhand_throw"):
 		if is_grabbing == true:
 			wants_to_drop = true
 			if grab_object != null:
@@ -720,20 +766,13 @@ func drop_grabable():
 				print("Grab broken by throw")
 				interaction_handled = true
 				
-				# TODO: This duplicates code in update_throw_state(); fix that
-				throw_strength = 40 * grab_object.mass
-				print(throw_strength, " is throw_strength before 75 cap")
-				if throw_strength > 75:
-					throw_strength = 75
-				
 				throw_impulse_and_damage(grab_object)
 				
 				wanna_grab = false
-	if Input.is_action_just_released("playerhand|main_throw") or Input.is_action_just_released("playerhand|offhand_throw"):
+				
+	if Input.is_action_just_released("playerhand|mainhand_throw") or Input.is_action_just_released("playerhand|offhand_throw"):
 		wants_to_drop = false
-
-
-func update_throw_state(throw_item : EquipmentItem, delta : float):
+	
 	if throw_state == ThrowState.PRESSING:
 		throw_item = character.inventory.get_mainhand_item() if throw_item_hand == ItemSelection.ITEM_MAINHAND else character.inventory.get_offhand_item()
 		#throw_item.set_item_state(GlobalConsts.ItemState.DROPPED)
@@ -742,9 +781,17 @@ func update_throw_state(throw_item : EquipmentItem, delta : float):
 		if throw_press_length > hold_time_to_grab:
 			if _placing_blueprint == null:
 				_placing_blueprint = throw_item.duplicate()
-				var _placing_blueprint_mesh: MeshInstance3D = _placing_blueprint.get_node("MeshInstance3D") # TODO: this is not going to be reliable
-				var shader: ShaderMaterial = load("res://resources/shaders/blueprints/blueprint.tres")
-				_placing_blueprint_mesh.set_material_override(shader)
+				#var _placing_blueprint_mesh: MeshInstance3D = _placing_blueprint.get_node("MeshInstance3D") # TODO: this is not going to be reliable
+				# Check all MeshInstances in the item scene until we find the first non-null one, and use that for the blueprint shader
+				var queue : Array[Node] = _placing_blueprint.get_children()
+				while not queue.is_empty():
+					var _placing_blueprint_mesh = queue.pop_front()
+					queue.append_array(_placing_blueprint_mesh.get_children())
+					print(_placing_blueprint_mesh)
+					if _placing_blueprint_mesh is MeshInstance3D:
+						if _placing_blueprint_mesh.mesh:
+							prints("_placing_blueprint_mesh that's not empty:", _placing_blueprint_mesh)
+							_placing_blueprint_mesh.set_material_override(should_place_blueprint_shader)
 			
 			if _placing_blueprint:
 				current_control_mode.aimcast.add_exception(_placing_blueprint)
@@ -830,24 +877,12 @@ func update_throw_state(throw_item : EquipmentItem, delta : float):
 			else:
 				character.inventory.drop_offhand_item()
 				
-			if throw_item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
-				throw_strength = 40 * throw_item.mass
-			else:
-				throw_strength = 50 * throw_item.mass
-#			print(throw_strength, " is throw_strength before 75 cap")
-#			if throw_strength > 75:
-#				throw_strength = 75
-				
-			# At this point, the item is still equipped, so we wait until
-			# it exits the tree and is re inserted in the world
-#			var x_pos = throw_item.global_transform.origin.x
-			# Applies unique throw  logic to item if its a melee item
 			throw_impulse_and_damage(throw_item)
 	
 	# throw_state defined here, will this get wiped by the physics_process nulling of throw_item?
 	match throw_state:
 		ThrowState.IDLE:
-			if Input.is_action_just_pressed("playerhand|main_throw") and owner.inventory.get_mainhand_item() and is_grabbing == false and owner.is_reloading == false:
+			if Input.is_action_just_pressed("playerhand|mainhand_throw") and owner.inventory.get_mainhand_item() and is_grabbing == false and owner.is_reloading == false:
 				throw_item_hand = ItemSelection.ITEM_MAINHAND
 				throw_state = ThrowState.PRESSING
 				throw_press_length = 0.0
@@ -856,7 +891,7 @@ func update_throw_state(throw_item : EquipmentItem, delta : float):
 				throw_state = ThrowState.PRESSING
 				throw_press_length = 0.0
 		ThrowState.PRESSING:
-			if Input.is_action_pressed("playerhand|main_throw" if throw_item_hand == ItemSelection.ITEM_MAINHAND else "playerhand|offhand_throw"):
+			if Input.is_action_pressed("playerhand|mainhand_throw" if throw_item_hand == ItemSelection.ITEM_MAINHAND else "playerhand|offhand_throw"):
 				throw_press_length += delta
 			else:
 				throw_state = ThrowState.SHOULD_PLACE if throw_press_length > hold_time_to_grab else ThrowState.SHOULD_THROW
@@ -865,6 +900,16 @@ func update_throw_state(throw_item : EquipmentItem, delta : float):
 
 
 func throw_impulse_and_damage(item):
+	# Calculate throw strength
+	if item is PickableItem:
+		if item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
+			throw_strength = 50.0 * item.mass
+	else:
+		throw_strength = 100
+	print(throw_strength, " is throw_strength")
+	#if throw_strength > 75:
+		#throw_strength = 75
+	
 	var impulse = current_control_mode.get_aim_direction() * throw_strength
 	
 	#if item is MeleeItem:

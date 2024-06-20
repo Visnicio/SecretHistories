@@ -37,37 +37,6 @@ var on_cooldown = false
 @onready var melee_hitbox = $Hitbox as Area3D
 
 
-func attack_thrust():
-	can_hit = true
-	did_a_thrust = true
-	$Sounds/Thrust.play()
-	$CooldownTimer.start(cooldown)
-	on_cooldown = true
-#	emit_signal("on_attack")  #not used at the moment; should be used to signal up to Animation Player and Hitbox?
-	
-#	var melee_anim
-#	if weapon_type == WeaponType.COMPLEX_HILT_ONE_HAND:
-#		melee_anim = owner_character.find_node("SabreTechniques")
-#		if not melee_anim.is_playing():
-#			can_hit = true
-#			melee_anim.play("ThrustFromTierce")
-#			$Sounds/Thrust.play()
-#			yield(melee_anim, "animation_finished")
-#			owner_character.stamina -= 30
-#			can_hit = false
-#			melee_anim.queue("RecoveryThrustToTierce")
-#	if weapon_type == WeaponType.POLEARM:
-#		melee_anim = owner_character.find_node("PolearmTechniques")
-#		if not melee_anim.is_playing():
-#			can_hit = true
-#			melee_anim.play("polearm_thrust_from_right")
-#			$Sounds/Thrust.play()
-#			yield(melee_anim, "animation_finished")
-#			character.stamina -= 30 # this is bugged with halberd
-#			can_hit = false
-#			melee_anim.queue("polearm_recovery_from_right")
-
-
 func attack_cut():
 	can_hit = true
 	did_a_cut = true
@@ -99,14 +68,45 @@ func attack_cut():
 #			melee_anim.queue("polearm_cut_2_recovery") # WIP, AnimationPlayer got wiped during import_items merge
 
 
+func attack_thrust():
+	can_hit = true
+	did_a_thrust = true
+	$Sounds/Thrust.play()
+	$CooldownTimer.start(cooldown)
+	on_cooldown = true
+#	emit_signal("on_attack")  #not used at the moment; should be used to signal up to Animation Player and Hitbox?
+	
+#	var melee_anim
+#	if weapon_type == WeaponType.COMPLEX_HILT_ONE_HAND:
+#		melee_anim = owner_character.find_node("SabreTechniques")
+#		if not melee_anim.is_playing():
+#			can_hit = true
+#			melee_anim.play("ThrustFromTierce")
+#			$Sounds/Thrust.play()
+#			yield(melee_anim, "animation_finished")
+#			owner_character.stamina -= 30
+#			can_hit = false
+#			melee_anim.queue("RecoveryThrustToTierce")
+#	if weapon_type == WeaponType.POLEARM:
+#		melee_anim = owner_character.find_node("PolearmTechniques")
+#		if not melee_anim.is_playing():
+#			can_hit = true
+#			melee_anim.play("polearm_thrust_from_right")
+#			$Sounds/Thrust.play()
+#			yield(melee_anim, "animation_finished")
+#			character.stamina -= 30 # this is bugged with halberd
+#			can_hit = false
+#			melee_anim.queue("polearm_recovery_from_right")
+
+
 func _use_primary():
 	if not on_cooldown:
-		attack_thrust()
+		attack_cut()
 
 
 func _use_secondary():
 	if not on_cooldown:
-		attack_cut()
+		attack_thrust()
 
 
 #	TODO: Changing the status of the weapon (dropping the weapon or unequiping it)
@@ -159,9 +159,9 @@ func _on_Hitbox_body_entered(body):
 		secondary_damage2 /= 2
 	
 	# This pushes the hit object if it's a RigidBody
-	if body is RigidBody3D and can_hit == true:
-		# TODO: fix this, it's always pointing one direction possible because base character scene doesn't rotate?
-		body.apply_central_impulse(-owner_character.global_transform.basis.z * primary_damage1)
-		body.apply_central_impulse(-owner_character.global_transform.basis.z * primary_damage2)
-		body.apply_central_impulse(-owner_character.global_transform.basis.z * secondary_damage1)
-		body.apply_central_impulse(-owner_character.global_transform.basis.z * secondary_damage2)
+	#if body is RigidBody3D and can_hit == true:
+		## TODO: fix this, it's always pointing one direction possible because base character scene doesn't rotate?
+		#body.apply_central_impulse(-owner_character.global_transform.basis.z * primary_damage1)
+		#body.apply_central_impulse(-owner_character.global_transform.basis.z * primary_damage2)
+		#body.apply_central_impulse(-owner_character.global_transform.basis.z * secondary_damage1)
+		#body.apply_central_impulse(-owner_character.global_transform.basis.z * secondary_damage2)
