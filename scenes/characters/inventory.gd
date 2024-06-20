@@ -127,7 +127,9 @@ func add_item(item : PickableItem) -> bool:
 		else:
 			# Before anything, check if the item can be stacked on anything in the hotbar
 			for hotbar_item: EquipmentItem in hotbar:
-				if hotbar_item and hotbar_item.stackable_resource != null and hotbar_item.stackable_resource.stack_name == item.stackable_resource.stack_name:
+				if hotbar_item == null: continue # go to next hotbar_item if null
+				
+				if hotbar_item.stackable_resource != null and item.stackable_resource != null and hotbar_item.stackable_resource.stack_name == item.stackable_resource.stack_name:
 					print("the item can stack with: " + hotbar_item.name)
 					if hotbar_item.stackable_resource.items_stacked.size() == hotbar_item.stackable_resource.max_stack:
 						print("... but its at full capacity rn")
@@ -138,7 +140,6 @@ func add_item(item : PickableItem) -> bool:
 						if item.is_inside_tree():
 							item.get_parent().remove_child(item)
 						
-						#emit_signal("hotbar_changed", slot) # TODO - verify the params I need to pass
 						emit_signal("inventory_changed")
 						return true
 				pass
