@@ -6,25 +6,34 @@ enum HandEnum {
 	OFF_HAND
 }
 
+## Emmited when the bulky item has changed
 signal bulky_item_changed()
-# Emitted when a hotbar slot changes (item added or removed)
-signal hotbar_changed(slot)
-# Emitted when the user selects a new slot for the main hand
-signal mainhand_slot_changed(previous, current)
-# Emitted when the user selects a new slot for the offhand
-signal offhand_slot_changed(previous, current)
-# Emitted when the ammount of a tiny item changes
 
+## Emitted when a hotbar slot changes (item added or removed), it needs a reference for what slot has changed
+signal hotbar_changed(slot)
+
+## Emitted when the user selects a new slot for the main hand
+signal mainhand_slot_changed(previous, current)
+
+## Emitted when the user selects a new slot for the offhand
+signal offhand_slot_changed(previous, current)
+
+## Emitted when the ammount of a tiny item changes
 signal tiny_item_changed(item, previous_amount, curent_amount)
-# Emitted to fadein the HUD UI
+
+## Emitted to fadein the HUD UI
 signal inventory_changed
-# Emitted to hide the HUD UI when player dies
+
+## Emitted to hide the HUD UI when player dies
 signal player_died
 
+## Emmited when the mainhand item was unequipped
 signal unequip_mainhand
+
+## Emmited when the offhand item was unequipped
 signal unequip_offhand
 
-# 0 is 1, 10 is empty_hands
+## 0 is the first slot (1), 10 is the empty_hands slot
 const HOTBAR_SIZE : int = 11
 
 # Items tracked exclusively by amount, don't contribute to weight,
@@ -68,7 +77,7 @@ func _ready():
 	current_offhand_slot = hands_free_slot
 
 
-# Returns wether a given node can be added as an Item to this inventory
+## Returns a boolean when a given node can be added as an Item to this inventory
 func can_pickup_item(item : PickableItem) -> bool:
 	# Can only pickup dropped items
 	# (may change later to steal weapons, or we can do that by dropping them first)
@@ -140,8 +149,7 @@ func add_item(item : PickableItem) -> bool:
 			var target_slot: int = 0
 			
 			### Probably can be cleaned up - part 1 is to put lights offhand, part 2 is everything else
-			### Part 1 - Checks if something is in offhand; if not, and this is a light, put it in offhand
-			
+			### Part 1 - Checks if something is in offhand; if not, and the picking item is a light, put it in offhand
 			if _item_is_light_source(item):
 				if current_offhand_equipment == null or current_offhand_equipment is EmptyHand:
 					if hotbar[target_slot] != null and !current_mainhand_slot:
@@ -164,78 +172,47 @@ func add_item(item : PickableItem) -> bool:
 							set_offhand_slot(target_slot)   # This is what puts it in off-hand
 							equip_offhand_item()
 							return true   # Thus not processing the further autoequip logic below
-			
 			else:
-				pass
-
+				### Part 2 - Otherwise, normal rules: Select an empty slot, prioritizing the current one, if empty
+				target_slot = current_mainhand_slot
+				# Then the offhand, preferring this slot for lights
+				if hotbar[target_slot] != null:
+					print("Current hotbar slot, ", target_slot + 1, " is null. Setting slot to current offhand slot")
+					target_slot = current_offhand_slot
+				# Then the first empty slot
+				if hotbar[target_slot] != null:
+					target_slot = hotbar.find(null)
+				# This checks if the slot to add the item isn't the hands-free slot then adds the item to the slot
+				if target_slot != hands_free_slot:
+					hotbar[target_slot] = item
 					
-			### Part 2 - Otherwise, normal rules: Select an empty slot, prioritizing the current one, if empty
-			target_slot = current_mainhand_slot
-			# Then the offhand, preferring this slot for lights
-			if hotbar[target_slot] != null:
-				
-				#var current_equipped_item: EquipmentItem = hotbar[slot] as EquipmentItem
-				#if current_equipped_item.stackable_resource != null and current_equipped_item.stackable_resource == item.stackable_resource: #checks if the current mainhand item is stackable
-					#print("the item can be stacked with the mainhand item")
-				#else:
-				
-				print("Current hotbar slot, ", target_slot + 1, " is null. Setting slot to current offhand slot")
-				target_slot = current_offhand_slot
-			# Then the first empty slot
-			if hotbar[target_slot] != null:
-				target_slot = hotbar.find(null)
-			# This checks if the slot to add the item isn't the hands-free slot then adds the item to the slot
-			if target_slot != hands_free_slot:
-				hotbar[target_slot] = item
-				
-				if item.stackable_resource != null:
-					item.stackable_resource.add_item(item)
-				# Schedule the item removal from the world
-				if item.is_inside_tree():
-					item.get_parent().remove_child(item)
-				
-				emit_signal("hotbar_changed", target_slot)
-				emit_signal("inventory_changed")
-				
-				### Auto-equip
-				# Autoequip if possible - main idea is prefer lights in off-hand and never forceably
-				# put a medium gun in hand if it means pushing out a (lit) light-source
-				# (we currently don't check if it's lit)
-				if current_mainhand_slot == target_slot and not bulky_equipment:
-					print("current slot is added item slot, which is ", target_slot + 1)
-					if current_offhand_equipment is LanternItem or current_offhand_equipment is CandleItem or current_offhand_equipment is TorchItem or current_offhand_equipment is CandelabraItem:
-						print("...and current offhand is a light")
-						if item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
-							equip_mainhand_item()
-							print("...and picked up item is a small item")
-							return true
-						if item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM and item is MeleeItem:
-							equip_mainhand_item()
-							print("...and picked up item is a medium melee weapon")
-	
-					elif item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
-						equip_mainhand_item()
-						print("...and picked up item is a small item")
-						return true
+					if item.stackable_resource != null:
+						item.stackable_resource.add_item(item)
+					# Schedule the item removal from the world
+					if item.is_inside_tree():
+						item.get_parent().remove_child(item)
 					
-					# Medium items
-					elif item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM:
-						equip_mainhand_item()
+					emit_signal("hotbar_changed", target_slot)
+					emit_signal("inventory_changed")
 					
-				elif current_offhand_slot == target_slot and not bulky_equipment and item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
-					equip_offhand_item()
-			
-			# Encumbrance makes character louder and more visible. Character uses more stamina.
-			# Eventually will affect mantling and swimming.
-			if item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM:
-				encumbrance += 1
-			if item.item_size == GlobalConsts.ItemSize.SIZE_BULKY:
-				encumbrance += 2
+					### Auto-equip
+					var was_equipped: bool = _auto_equip_item(item, target_slot)
+				
+				# Encumbrance makes character louder and more visible. Character uses more stamina.
+				# Eventually will affect mantling and swimming.
+				if item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM:
+					encumbrance += 1
+				if item.item_size == GlobalConsts.ItemSize.SIZE_BULKY:
+					encumbrance += 2
+					
+				return true
 	
 	return false
 
 
 # Functions to interact with tiny items
+
+## Insert a tiny_item into the inventory, it also neeeds an amount, emits tiny_item_changed
 func insert_tiny_item(item : TinyItemData, amount : int):
 	if not tiny_items.has(item):
 		tiny_items[item] = 0
@@ -244,7 +221,7 @@ func insert_tiny_item(item : TinyItemData, amount : int):
 	var new = tiny_items[item]
 	emit_signal("tiny_item_changed", item, prev, new)
 
-
+## Remove a tiny_item from the inventory, it also neeeds an amount, emits tiny_item_changed
 func remove_tiny_item(item : TinyItemData, amount : int) -> bool:
 	if tiny_items.has(item) and tiny_items[item] >= amount:
 		var prev = tiny_items[item]
@@ -256,11 +233,11 @@ func remove_tiny_item(item : TinyItemData, amount : int) -> bool:
 		return true
 	return false
 
-
+## Retrieves the amount of a tiny item in the invetory, if the item is not present, returns 0
 func tiny_item_amount(item : TinyItemData) -> int:
 	return 0 if not tiny_items.has(item) else tiny_items[item]
 
-
+## Perfoms heavy logic to equip the mainhand_item, it uses the var current_mainhand_equipment
 func equip_mainhand_item():
 	await get_tree().create_timer(0.5).timeout
 	# temporary hack (issue #409)
@@ -290,7 +267,7 @@ func equip_mainhand_item():
 			owner.mainhand_equipment_root.add_child(item)
 		emit_signal("inventory_changed")
 
-
+## Perfoms heavy logic to unequip the mainhand_item, it uses the var current_mainhand_equipment
 func unequip_mainhand_item():
 	# temporary hack (issue #409)
 	if not is_instance_valid(current_mainhand_equipment):
@@ -308,7 +285,7 @@ func unequip_mainhand_item():
 	else:
 		item.get_parent().remove_child(item)
 
-
+## Perfoms heavy logic to equip a bulky_item and clearing the player hands for it
 func equip_bulky_item(item : EquipmentItem):
 	# Clear any currently equipped items
 	unequip_mainhand_item()
@@ -482,8 +459,8 @@ func drop_hotbar_slot(slot : int) -> Node:
 	return item
 
 
-# Drops the item, it must be unequipped first
-# Note that the drop is done in a deferred manner
+## Drops the item, it must be unequipped first[br]
+## Note that the drop is done in a deferred manner
 func _drop_item(item : EquipmentItem):
 	if owner is Player:
 		if owner.player_controller.throw_state == owner.player_controller.ThrowState.SHOULD_PLACE:
@@ -663,17 +640,19 @@ func _try_add_item_to_existing_stack(item_to_stack: EquipmentItem) -> bool:
 			print("the item can stack with: " + hotbar_item.name)
 			if hotbar_item.stackable_resource.items_stacked.size() == hotbar_item.stackable_resource.max_stack:
 				print("... but its at full capacity rn")
-			else:
-				print("Hurray! Stacking boois")
-				hotbar_item.stackable_resource.add_item(item_to_stack)
-				_remove_item_from_world(item_to_stack)
-				
-				emit_signal("inventory_changed")
-				return true
+				return false
+			
+			print("Hurray! Stacking boois")
+			hotbar_item.stackable_resource.add_item(item_to_stack)
+			_remove_item_from_world(item_to_stack)
+			
+			emit_signal("inventory_changed")
+			return true
 	
 	return false
 	
 
+## Util func to defer the item removal from world space
 func _remove_item_from_world(item: EquipmentItem) -> void:
 	# Schedule the item removal from the world
 	if item.is_inside_tree():
@@ -685,3 +664,36 @@ func _item_is_light_source(item: PickableItem) -> bool:
 		return true
 	else:
 		return false
+
+## func used when adding a item to the inventory
+func _auto_equip_item(item: EquipmentItem, target_slot: int) -> bool:
+	# Autoequip if possible - main idea is prefer lights in off-hand and never forceably
+	# put a medium gun in hand if it means pushing out a (lit) light-sourcecunt
+	# (we currently don't check if it's lit)
+	if current_mainhand_slot == target_slot and not bulky_equipment:
+		print("current slot is added item slot, which is ", target_slot + 1)
+		if current_offhand_equipment is LanternItem or current_offhand_equipment is CandleItem or current_offhand_equipment is TorchItem or current_offhand_equipment is CandelabraItem:
+			print("...and current offhand is a light")
+			if item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
+				equip_mainhand_item()
+				print("...and picked up item is a small item")
+				return true
+			if item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM and item is MeleeItem:
+				equip_mainhand_item()
+				print("...and picked up item is a medium melee weapon")
+
+		elif item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
+			equip_mainhand_item()
+			print("...and picked up item is a small item")
+			return true
+		
+		# Medium items
+		elif item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM:
+			equip_mainhand_item()
+			return true
+		
+	elif current_offhand_slot == target_slot and not bulky_equipment and item.item_size == GlobalConsts.ItemSize.SIZE_SMALL:
+		equip_offhand_item()
+		return true
+	
+	return false
