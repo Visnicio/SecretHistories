@@ -172,40 +172,40 @@ func add_item(item : PickableItem) -> bool:
 							set_offhand_slot(target_slot)   # This is what puts it in off-hand
 							equip_offhand_item()
 							return true   # Thus not processing the further autoequip logic below
-			else:
-				### Part 2 - Otherwise, normal rules: Select an empty slot, prioritizing the current one, if empty
-				target_slot = current_mainhand_slot
-				# Then the offhand, preferring this slot for lights
-				if hotbar[target_slot] != null:
-					print("Current hotbar slot, ", target_slot + 1, " is null. Setting slot to current offhand slot")
-					target_slot = current_offhand_slot
-				# Then the first empty slot
-				if hotbar[target_slot] != null:
-					target_slot = hotbar.find(null)
-				# This checks if the slot to add the item isn't the hands-free slot then adds the item to the slot
-				if target_slot != hands_free_slot:
-					hotbar[target_slot] = item
-					
-					if item.stackable_resource != null:
-						item.stackable_resource.add_item(item)
-					# Schedule the item removal from the world
-					if item.is_inside_tree():
-						item.get_parent().remove_child(item)
-					
-					emit_signal("hotbar_changed", target_slot)
-					emit_signal("inventory_changed")
-					
-					### Auto-equip
-					var was_equipped: bool = _auto_equip_item(item, target_slot)
+			
+			### Part 2 - Otherwise, normal rules: Select an empty slot, prioritizing the current one, if empty
+			target_slot = current_mainhand_slot
+			# Then the offhand, preferring this slot for lights
+			if hotbar[target_slot] != null:
+				print("Current hotbar slot, ", target_slot + 1, " is null. Setting slot to current offhand slot")
+				target_slot = current_offhand_slot
+			# Then the first empty slot
+			if hotbar[target_slot] != null:
+				target_slot = hotbar.find(null)
+			# This checks if the slot to add the item isn't the hands-free slot then adds the item to the slot
+			if target_slot != hands_free_slot:
+				hotbar[target_slot] = item
 				
-				# Encumbrance makes character louder and more visible. Character uses more stamina.
-				# Eventually will affect mantling and swimming.
-				if item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM:
-					encumbrance += 1
-				if item.item_size == GlobalConsts.ItemSize.SIZE_BULKY:
-					encumbrance += 2
-					
-				return true
+				if item.stackable_resource != null:
+					item.stackable_resource.add_item(item)
+				# Schedule the item removal from the world
+				if item.is_inside_tree():
+					item.get_parent().remove_child(item)
+				
+				emit_signal("hotbar_changed", target_slot)
+				emit_signal("inventory_changed")
+				
+				### Auto-equip
+				var was_equipped: bool = _auto_equip_item(item, target_slot)
+			
+			# Encumbrance makes character louder and more visible. Character uses more stamina.
+			# Eventually will affect mantling and swimming.
+			if item.item_size == GlobalConsts.ItemSize.SIZE_MEDIUM:
+				encumbrance += 1
+			if item.item_size == GlobalConsts.ItemSize.SIZE_BULKY:
+				encumbrance += 2
+				
+			return true
 	
 	return false
 
