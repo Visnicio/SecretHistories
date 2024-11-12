@@ -1,0 +1,62 @@
+[gd_scene load_steps=9 format=3 uid="uid://bfw10bkhk8t22"]
+
+[ext_resource type="PackedScene" uid="uid://dh20f4n6k2h0p" path="res://resources/models/fencing_sim/world/floor.glb" id="1_467sw"]
+[ext_resource type="PackedScene" uid="uid://dmuv0ddsypdxr" path="res://resources/models/fencing_sim/world/ceiling.glb" id="2_4kshk"]
+[ext_resource type="PackedScene" uid="uid://6msa32pxnbrk" path="res://scenes/characters/player/player.tscn" id="3_5yjvc"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h35r4"]
+rayleigh_color = Color(0.0273438, 0.0273438, 0.0273438, 1)
+mie_color = Color(0.0078125, 0.0078125, 0.0078125, 1)
+
+[sub_resource type="Sky" id="Sky_md0s1"]
+sky_material = SubResource("PhysicalSkyMaterial_h35r4")
+
+[sub_resource type="Environment" id="Environment_2yo75"]
+background_mode = 2
+sky = SubResource("Sky_md0s1")
+ambient_light_source = 2
+tonemap_mode = 2
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0738
+volumetric_fog_emission = Color(0.0664063, 0.0664063, 0.0664063, 1)
+volumetric_fog_anisotropy = -0.4
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nt513"]
+size = Vector3(55.0034, 0.514526, 54.9531)
+
+[sub_resource type="FogMaterial" id="FogMaterial_a5hj6"]
+density = 0.6667
+emission = Color(0.136719, 0.136719, 0.136719, 1)
+height_falloff = 0.285263
+edge_fade = 2.26274
+
+[node name="FencingSimWorld" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_2yo75")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.672974, 0.736873, -0.0642123, 0.103393, -0.00775486, 0.99461, 0.732404, -0.675986, -0.081406, 0, 1.23176, 0)
+light_color = Color(0.984375, 0.949768, 0.949768, 1)
+shadow_enabled = true
+
+[node name="ceiling" parent="." instance=ExtResource("2_4kshk")]
+
+[node name="Player" parent="." instance=ExtResource("3_5yjvc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.398345, 0.038352, -23.0175)
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="floor_model" parent="Floor" instance=ExtResource("1_467sw")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0129967, -0.242737, 0)
+shape = SubResource("BoxShape3D_nt513")
+
+[node name="FogVolume" type="FogVolume" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.608887, 2.28644, 0.231323)
+size = Vector3(5.50879, 6.57288, 3.85425)
+material = SubResource("FogMaterial_a5hj6")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.119877, 0, 0.992789, 0, 1, 0, -0.992789, 0, 0.119877, 7.11113, 0.904209, 0)

@@ -2,6 +2,7 @@ extends Control
 
 
 const GAME_SCENE = preload("res://scenes/game.tscn")
+const FENCING_SIM_SCENE = preload("res://scenes/worlds/fencing_sim_world.tscn")
 
 var game : Game
 
@@ -58,3 +59,15 @@ func _on_GameIntro_intro_done():
 
 func _on_ReturnButton_pressed() -> void:
 	var _error = get_tree().change_scene_to_file("res://scenes/ui/title_menu.tscn")
+
+
+func _on_fencing_demo_pressed() -> void:
+	$MarginContainer/HBoxContainer.visible = false
+	$TextureRect.visible = false
+	BackgroundMusic.stop()
+	
+	# Loads the fencing sim scene
+	var fencing_sim_scene = FENCING_SIM_SCENE.instantiate()
+	get_tree().root.add_child(fencing_sim_scene)
+	await get_tree().create_timer(0.5).timeout
+	get_tree().call_deferred("unload_current_scene")
