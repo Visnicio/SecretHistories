@@ -1,49 +1,60 @@
-[gd_scene load_steps=9 format=3 uid="uid://bfw10bkhk8t22"]
+[gd_scene load_steps=15 format=3 uid="uid://bfw10bkhk8t22"]
 
 [ext_resource type="PackedScene" uid="uid://dh20f4n6k2h0p" path="res://resources/models/fencing_sim/world/floor.glb" id="1_467sw"]
+[ext_resource type="Script" path="res://scenes/worlds/fencing_sim/fencing_sim_world.gd" id="1_ec46l"]
 [ext_resource type="PackedScene" uid="uid://dmuv0ddsypdxr" path="res://resources/models/fencing_sim/world/ceiling.glb" id="2_4kshk"]
-[ext_resource type="PackedScene" uid="uid://6msa32pxnbrk" path="res://scenes/characters/player/player.tscn" id="3_5yjvc"]
-
-[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h35r4"]
-rayleigh_color = Color(0.0273438, 0.0273438, 0.0273438, 1)
-mie_color = Color(0.0078125, 0.0078125, 0.0078125, 1)
-
-[sub_resource type="Sky" id="Sky_md0s1"]
-sky_material = SubResource("PhysicalSkyMaterial_h35r4")
-
-[sub_resource type="Environment" id="Environment_2yo75"]
-background_mode = 2
-sky = SubResource("Sky_md0s1")
-ambient_light_source = 2
-tonemap_mode = 2
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.0738
-volumetric_fog_emission = Color(0.0664063, 0.0664063, 0.0664063, 1)
-volumetric_fog_anisotropy = -0.4
+[ext_resource type="Script" path="res://scenes/worlds/fencing_sim/candle_circle.gd" id="4_3451y"]
+[ext_resource type="PackedScene" uid="uid://c8b20twjhptbk" path="res://scenes/objects/pickable_items/equipment/consumable/disposable_lights/candle/candle.tscn" id="5_rvdlx"]
+[ext_resource type="PackedScene" uid="uid://iik6knjj75ux" path="res://scenes/objects/pickable_items/equipment/melee/knife_old/knife_old.tscn" id="6_v13d2"]
+[ext_resource type="PackedScene" uid="uid://b5mk18afmvbxy" path="res://resources/models/fencing_sim/world/scarecrow.glb" id="7_cgqxg"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nt513"]
 size = Vector3(55.0034, 0.514526, 54.9531)
 
 [sub_resource type="FogMaterial" id="FogMaterial_a5hj6"]
-density = 0.6667
+density = 2.1667
 emission = Color(0.136719, 0.136719, 0.136719, 1)
 height_falloff = 0.285263
 edge_fade = 2.26274
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kum0k"]
+transparency = 1
+vertex_color_use_as_albedo = true
+
+[sub_resource type="Curve" id="Curve_vvo71"]
+_data = [Vector2(1e-05, 0.0927835), 0.0, 0.0, 0, 0, Vector2(0.507937, 0.226804), 0.0, 0.0, 0, 0, Vector2(1, 0.0309279), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_hsnk3"]
+curve = SubResource("Curve_vvo71")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3841g"]
+emission_shape = 3
+emission_box_extents = Vector3(10, 2, 10)
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -2.0
+linear_accel_max = 0.0199978
+scale_min = 0.05
+scale_max = 0.07
+color = Color(0.95, 0.893, 0.722, 0.0392157)
+alpha_curve = SubResource("CurveTexture_hsnk3")
+turbulence_influence_min = 0.433
+turbulence_influence_max = 0.433
+
+[sub_resource type="SphereMesh" id="SphereMesh_2ydaf"]
+
 [node name="FencingSimWorld" type="Node3D"]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_2yo75")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.672974, 0.736873, -0.0642123, 0.103393, -0.00775486, 0.99461, 0.732404, -0.675986, -0.081406, 0, 1.23176, 0)
-light_color = Color(0.984375, 0.949768, 0.949768, 1)
-shadow_enabled = true
+script = ExtResource("1_ec46l")
 
 [node name="ceiling" parent="." instance=ExtResource("2_4kshk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.36333, 0)
 
-[node name="Player" parent="." instance=ExtResource("3_5yjvc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.398345, 0.038352, -23.0175)
+[node name="SpotLight3D" type="SpotLight3D" parent="ceiling"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 4.95385, 0)
+spot_range = 9.52345
+spot_attenuation = -0.42
+spot_angle = 39.18
+spot_angle_attenuation = 3.15938e-05
 
 [node name="Floor" type="StaticBody3D" parent="."]
 
@@ -55,8 +66,44 @@ shape = SubResource("BoxShape3D_nt513")
 
 [node name="FogVolume" type="FogVolume" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.608887, 2.28644, 0.231323)
+visible = false
 size = Vector3(5.50879, 6.57288, 3.85425)
 material = SubResource("FogMaterial_a5hj6")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.119877, 0, 0.992789, 0, 1, 0, -0.992789, 0, 0.119877, 7.11113, 0.904209, 0)
+
+[node name="CandleCircle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0908725, 0.318088)
+script = ExtResource("4_3451y")
+diameter = 12.4
+candle_count = 12
+candle_scene = ExtResource("5_rvdlx")
+
+[node name="OldKnife" parent="." instance=ExtResource("6_v13d2")]
+transform = Transform3D(1, 0, 0, 0, -0.711094, -0.703097, 0, 0.703097, -0.711094, -0.064896, 1.28279, 4.58208)
+freeze = true
+
+[node name="scarecrow2" parent="." instance=ExtResource("7_cgqxg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0656321, 0.0145258, 4.79664)
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0946, 0)
+material_override = SubResource("StandardMaterial3D_kum0k")
+amount = 220
+lifetime = 5.0
+process_material = SubResource("ParticleProcessMaterial_3841g")
+draw_pass_1 = SubResource("SphereMesh_2ydaf")
+
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75477" to="CandleCircle/@RigidBody3D@75477" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75479" to="CandleCircle/@RigidBody3D@75479" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75481" to="CandleCircle/@RigidBody3D@75481" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75483" to="CandleCircle/@RigidBody3D@75483" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75485" to="CandleCircle/@RigidBody3D@75485" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75487" to="CandleCircle/@RigidBody3D@75487" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75489" to="CandleCircle/@RigidBody3D@75489" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75491" to="CandleCircle/@RigidBody3D@75491" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75493" to="CandleCircle/@RigidBody3D@75493" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75495" to="CandleCircle/@RigidBody3D@75495" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75497" to="CandleCircle/@RigidBody3D@75497" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@75499" to="CandleCircle/@RigidBody3D@75499" method="_item_state_changed"]
