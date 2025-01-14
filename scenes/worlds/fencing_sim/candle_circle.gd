@@ -38,7 +38,18 @@ func get_candles_world_position() -> Dictionary:
 		positions[child_index] = get_child(child_index).global_position
 	
 	return positions
-	pass
+
+## Returns useful data from candles, like [code]global_position[/code][br]
+## or [code]direction_to_center[/code]
+func get_candles_data() -> Dictionary:
+	var data: Dictionary
+	
+	for child_index: int in get_child_count():
+		var child: CandleItem = get_child(child_index)
+		data[child_index].global_position = child.global_position
+		data[child_index].direction_to_center = child.global_position.direction_to(global_position)
+	
+	return data
 
 ## Use this method whenever you need to update the circle
 func update_circle(new_diameter: float, new_candle_count: int) -> void:

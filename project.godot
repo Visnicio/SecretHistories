@@ -34,6 +34,7 @@ LoadScene="*res://globals/load_scene.gd"
 BackgroundMusic="*res://scenes/effects/background_music.tscn"
 SettingsConfig="*res://globals/settings_config.gd"
 Events="*res://globals/events.gd"
+ImGuiRoot="*res://addons/imgui-godot/data/ImGuiRoot.tscn"
 
 [debug]
 
@@ -54,7 +55,7 @@ description="An entirely forgettable game"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/imgui-godot/plugin.cfg")
 
 [input]
 
