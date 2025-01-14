@@ -2,14 +2,13 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cd3jdx6ub6ivu"
+uid="uid://ewsdeqeb3aaa"
 path.s3tc="res://.godot/imported/double_barrel_weapon_reload_DoubleBarrel_Metallic-DoubleBarrel_Roughness.png-d8dbc77417f02466680b8b47844f74d4.s3tc.ctex"
 path.etc2="res://.godot/imported/double_barrel_weapon_reload_DoubleBarrel_Metallic-DoubleBarrel_Roughness.png-d8dbc77417f02466680b8b47844f74d4.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={}
 
 [deps]
 

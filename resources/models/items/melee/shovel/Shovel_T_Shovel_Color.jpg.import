@@ -2,14 +2,13 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nl62yqbqfkkh"
+uid="uid://dygn5pw0xn0st"
 path.s3tc="res://.godot/imported/Shovel_T_Shovel_Color.jpg-337c74157b17be4a08860a96f942c01c.s3tc.ctex"
 path.etc2="res://.godot/imported/Shovel_T_Shovel_Color.jpg-337c74157b17be4a08860a96f942c01c.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={}
 
 [deps]
 

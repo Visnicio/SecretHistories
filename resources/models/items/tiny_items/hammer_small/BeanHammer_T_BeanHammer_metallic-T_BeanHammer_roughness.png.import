@@ -2,14 +2,13 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tfr3gy0w8872"
+uid="uid://bm30wpmrreuo5"
 path.s3tc="res://.godot/imported/BeanHammer_T_BeanHammer_metallic-T_BeanHammer_roughness.png-c38eda7e0290f946d37f9281bfc74558.s3tc.ctex"
 path.etc2="res://.godot/imported/BeanHammer_T_BeanHammer_metallic-T_BeanHammer_roughness.png-c38eda7e0290f946d37f9281bfc74558.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={}
 
 [deps]
 
