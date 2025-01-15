@@ -29,6 +29,7 @@ func _on_spawn_timer_timeount() -> void:
 func spawn_enemy(spawn_position: Vector3) -> void:
 	if ENEMY_SCENE == null:
 		push_error("No scene for the enemy instance was defined")
+		return
 	
 	var enemy: Node3D = ENEMY_SCENE.instantiate()
 	enemy.global_position = spawn_position

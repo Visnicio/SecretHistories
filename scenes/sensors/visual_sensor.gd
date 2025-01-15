@@ -17,6 +17,8 @@ signal light_detected(light, position)
 @export var _ik_target: NodePath
 var ik_target: Node3D
 
+@export var darkvision: bool = false
+
 #--------------------------------------------------------------------------#
 #                 Programmatically sets the vision frustrum.               #
 #--------------------------------------------------------------------------#
@@ -79,6 +81,7 @@ func get_aabb() -> AABB:
 
 
 func _ready() -> void:
+	darkvision = Settings.get_setting("enemies_with_darkvision")
 	ik_target = get_node(_ik_target)
 
 	add_area_nodes()
@@ -143,6 +146,10 @@ func process_player_detection(character: HumanoidCharacter) -> bool:
 
 func can_see_player(character: HumanoidCharacter) -> Player:
 	var player := get_player()
+	
+	if is_instance_valid(player) and darkvision:
+		return player
+	
 	# TODO(Character): Light level
 	if is_instance_valid(player):# and player.light_level > light_sensitivity_level:
 		var target := player.global_transform.origin

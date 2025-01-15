@@ -59,5 +59,5 @@ candle_manager = NodePath("../CandleCircle")
 spawn_root = NodePath("..")
 
 [connection signal="item_state_changed" from="CandleCircle/Candle" to="CandleCircle/Candle" method="_item_state_changed"]
-[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@19127" to="CandleCircle/@RigidBody3D@19127" method="_item_state_changed"]
-[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@19129" to="CandleCircle/@RigidBody3D@19129" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@17447" to="CandleCircle/@RigidBody3D@17447" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@17449" to="CandleCircle/@RigidBody3D@17449" method="_item_state_changed"]

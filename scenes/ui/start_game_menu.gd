@@ -1,6 +1,5 @@
 extends Control
 
-
 const GAME_SCENE = preload("res://scenes/game.tscn")
 const FENCING_SIM_SCENE = preload("res://scenes/worlds/fencing_sim_world.tscn")
 
@@ -33,6 +32,8 @@ func _on_GhostDetectionRange_value_changed(value: float) -> void:
 
 
 func _on_StartGame_pressed() -> void:
+	Settings.add_bool_setting("enemies_with_darkvision", false)
+	Settings.set_setting_group("enemies_with_darkvision", "Fencing Sim Settings")
 	$MarginContainer/HBoxContainer.visible = false
 	$TextureRect.visible = false
 	BackgroundMusic.stop()
@@ -67,7 +68,10 @@ func _on_fencing_demo_pressed() -> void:
 	$TextureRect.visible = false
 	BackgroundMusic.stop()
 	
+	Settings.add_bool_setting("enemies_with_darkvision", true)
+	Settings.set_setting_group("enemies_with_darkvision", "Fencing Sim Settings")
 	game.game_to_load = game.GAMES.FENCING_SIM # Sets game to load fencing sim
+	
 	get_tree().root.add_child(game)
 	await get_tree().create_timer(0.5).timeout
 	get_tree().call_deferred("unload_current_scene")
