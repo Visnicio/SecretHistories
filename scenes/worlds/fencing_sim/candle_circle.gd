@@ -39,15 +39,20 @@ func get_candles_world_position() -> Dictionary:
 	
 	return positions
 
-## Returns useful data from candles, like [code]global_position[/code][br]
-## or [code]direction_to_center[/code]
+## Returns useful data from each candle [br]
+## keys are candle index as child from candle_circle [br]
+## [code]global_position[/code][br]
+## [code]direction_to_center[/code][br]
 func get_candles_data() -> Dictionary:
 	var data: Dictionary
 	
 	for child_index: int in get_child_count():
 		var child: CandleItem = get_child(child_index)
-		data[child_index].global_position = child.global_position
-		data[child_index].direction_to_center = child.global_position.direction_to(global_position)
+		var new_data: Dictionary = {
+			"global_position" = child.global_position,
+			"direction_to_center" = child.global_position.direction_to(global_position)
+		}
+		data[child_index] = new_data
 	
 	return data
 
