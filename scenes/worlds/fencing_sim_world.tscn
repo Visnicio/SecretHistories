@@ -46,14 +46,14 @@ candle_count = 3
 candle_scene = ExtResource("5_rvdlx")
 
 [node name="OldKnife" parent="." instance=ExtResource("6_v13d2")]
-transform = Transform3D(1, 0, 0, 0, -0.711094, -0.703097, 0, 0.703097, -0.711094, -0.064896, 1.28279, 4.58208)
+transform = Transform3D(1, 0, 0, 0, -0.711094, -0.703097, 0, 0.703097, -0.711094, -0.064896, 1.28279, 1.31985)
 mass = 0.001
 gravity_scale = 0.0
 sleeping = true
 freeze = true
 
 [node name="scarecrow2" parent="." instance=ExtResource("7_cgqxg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0656321, 0.0145258, 4.79664)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0656321, 0.0145258, 1.53441)
 
 [node name="EnemySpawner" parent="." node_paths=PackedStringArray("candle_circle", "spawn_root") instance=ExtResource("8_k541a")]
 spawn_time = 2.0
@@ -62,5 +62,5 @@ spawn_root = NodePath("..")
 ENEMY_SCENE = ExtResource("9_7tk7h")
 
 [connection signal="item_state_changed" from="CandleCircle/Candle" to="CandleCircle/Candle" method="_item_state_changed"]
-[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@17447" to="CandleCircle/@RigidBody3D@17447" method="_item_state_changed"]
-[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@17449" to="CandleCircle/@RigidBody3D@17449" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@19625" to="CandleCircle/@RigidBody3D@19625" method="_item_state_changed"]
+[connection signal="item_state_changed" from="CandleCircle/@RigidBody3D@19627" to="CandleCircle/@RigidBody3D@19627" method="_item_state_changed"]
