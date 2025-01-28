@@ -19,15 +19,21 @@ func _ready():
 
 func initialize_hotbar():
 	inventory.connect("hotbar_changed", Callable(self, "hotbar_changed"))
+	inventory.hotbar_resized.connect(_on_hotbar_resized)
 #	inventory.connect("current_slot_changed", self, "current_slot_changed")
 #
-	for i in inventory.HOTBAR_SIZE: #0 to 9
+	if (GameManager.game.game_to_load == 1): # is loading fencing_sim
+		inventory.init_inventory_for_player(4, 5)
+	else:
+		inventory.init_inventory_for_player(11, 10)
+		
+	for i: int in inventory.hotbar_size:
 		var item = inventory.hotbar[i] as EquipmentItem
 		var item_name = item.item_name if item != null else ""
 		var item_amount = 1 if item != null else 0
 		var slot = $VBoxContainer.get_child(i)
 		slot.set_name(item_name)
-		slot.set_stack_size(str(item_amount))
+		# slot.set_stack_size(str(item_amount))
 		if i != inventory.current_mainhand_slot or i != inventory.current_offhand_slot:
 			slot.modulate.a = 0.6
 		else:
@@ -44,6 +50,23 @@ func hotbar_changed(slot):
 	var hotbar_slot = $VBoxContainer.get_child(slot)
 	hotbar_slot.set_name(item_name)
 	hotbar_slot.set_stack_size(str(item_amount))
+
+
+func _on_hotbar_resized(new_size: int) -> void:
+
+	print_debug("hotbar resized")
+
+	# every slots thats is not Bulky or -1
+	var positive_slots: Array[HBoxContainer] = []
+	for child: Control in $VBoxContainer.get_children():
+		if int(str(child.name)) >= 1:
+			child.visible = false
+			positive_slots.append(child)
+
+	for i: int in inventory.hotbar_size:
+		var slot = $VBoxContainer.get_child(i)
+		slot.visible = true
+	pass
 
 
 func current_slot_changed(previous, current):

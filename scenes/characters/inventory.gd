@@ -33,8 +33,11 @@ signal unequip_mainhand
 ## Emmited when the offhand item was unequipped
 signal unequip_offhand
 
+## Emmited when the game starts, to notify the size of the hotbar
+signal hotbar_resized(new_size: int)
+
 ## 0 is the first slot (1), 10 is the empty_hands slot
-const HOTBAR_SIZE : int = 11
+var hotbar_size : int = 11
 
 # Items tracked exclusively by amount, don't contribute to weight,
 # don't show in hotbar
@@ -60,7 +63,7 @@ var current_mainhand_equipment : EquipmentItem = null
 # Information about the item equipped on the offhand
 var current_offhand_slot : int = 0: set = set_offhand_slot
 var current_offhand_equipment : EquipmentItem = null
-
+  
 # Are we currently in the middle of swapping hands?
 var are_swapping : bool = false
 
@@ -73,8 +76,7 @@ var belt_item = null   # The item currently in the belt_position slot
 
 
 func _ready():
-	hotbar.resize(HOTBAR_SIZE)
-	current_offhand_slot = hands_free_slot
+	init_inventory_for_player(11, 10)
 
 
 ## Returns a boolean when a given node can be added as an Item to this inventory
@@ -697,3 +699,11 @@ func _auto_equip_item(item: EquipmentItem, target_slot: int) -> bool:
 		return true
 	
 	return false
+
+## Function to initialize array, data and UI for player's inventory
+func init_inventory_for_player(inventory_size: int, hands_free_slot: int) -> void:
+	hands_free_slot = hands_free_slot
+	hotbar.resize(inventory_size)
+	hotbar_size = inventory_size
+	hotbar_resized.emit(inventory_size)
+	pass

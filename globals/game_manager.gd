@@ -15,6 +15,7 @@ enum ScreenFilter {
 var game : Game
 var act = 0   # the game has five Acts/Chapters
 var is_player_dead = false
+var player: Player = null
 
 var world_gen_rng: RandomNumberGenerator = null
 
