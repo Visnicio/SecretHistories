@@ -13,7 +13,7 @@ var camera_pitch : float = 0.0
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and input.mouse_captured:
 		var sens = InputSettings.setting_mouse_sensitivity*0.01
 		camera_pitch -= sens*event.relative.y
 		camera_pitch = clamp(camera_pitch, - PI*0.5, PI*0.5)
