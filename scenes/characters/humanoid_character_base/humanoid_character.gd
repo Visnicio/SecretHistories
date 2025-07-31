@@ -20,7 +20,6 @@ const COLLISIONS_REPORTED = 4
 @onready var kick_cast: KickCast = $ModelRoot/KickCast
 
 
-
 var ground_ray_parameters := PhysicsRayQueryParameters3D.new()
 var ground_detection_test_parameters := PhysicsTestMotionParameters3D.new()
 var ceiling_detection_test_parameters := PhysicsTestMotionParameters3D.new()
@@ -37,6 +36,7 @@ func _ready() -> void:
 	ceiling_detection_test_parameters.motion = Vector3.UP*0.3
 	ceiling_detection_test_parameters.max_collisions = COLLISIONS_REPORTED
 
+
 func _physics_process(delta: float) -> void:
 	if global_rotation.y != 0:
 		state.facing = global_basis * state.facing
@@ -48,7 +48,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		state.stamina += parameters.stamina_drain_rate * delta
 	var target_crouch_ratio : float = 1.0 if (input.crouch and not state.sprinting) else 0.0
-	
+
 	var target_height = lerp(parameters.standing_height, parameters.crouch_height, target_crouch_ratio)
 	if target_height > character_collision.height:
 		ceiling_detection_test_parameters.motion = Vector3.UP * (target_height - character_collision.height + 0.1)
@@ -73,8 +73,9 @@ func _physics_process(delta: float) -> void:
 			target_crouch_ratio = inverse_lerp(parameters.standing_height, parameters.crouch_height, target_height)
 	state.current_crouch_ratio = move_toward(state.current_crouch_ratio, target_crouch_ratio, delta/parameters.crouch_animation_duration)
 	character_collision.height = lerp(parameters.standing_height, parameters.crouch_height, state.current_crouch_ratio)
-	
+
 	model_root.global_basis = state.facing
+
 
 func _integrate_forces(physics_state: PhysicsDirectBodyState3D) -> void:
 	state.was_on_ground = state.is_on_ground
@@ -133,8 +134,8 @@ func _integrate_forces(physics_state: PhysicsDirectBodyState3D) -> void:
 	if state.is_on_ground:
 		ground_normal = collision_normal
 		physics_state.transform.origin.y = move_toward(
-			physics_state.transform.origin.y, 
-			collision_position.y, 
+			physics_state.transform.origin.y,
+			collision_position.y,
 			2.0*physics_state.step
 		)
 		control_multiplier = 1.0
@@ -168,9 +169,11 @@ func _integrate_forces(physics_state: PhysicsDirectBodyState3D) -> void:
 
 	physics_state.linear_velocity += physics_state.total_gravity*physics_state.step
 
+
 func recoil() -> void:
 	print("recoil")
 	recoiled.emit()
+
 
 func kick():
 	if state.stamina < parameters.kick_stamina_cost or state.time_since_kick < parameters.kick_cooldown:
@@ -190,3 +193,27 @@ func kick():
 			hurtbox.damage(parameters.kick_damage, parameters.kick_damage_type, kick_direction, kick_origin)
 		pass
 	pass
+
+
+func dodge() -> void:
+	if state.stamina >= parameters.dodge_stamina_cost and state.time_since_dodge >= parameters.dodge_cooldown:
+		state.stamina -= parameters.dodge_stamina_cost
+		state.time_since_dodge = 0.0
+
+		# Apply impulse based on movement direction
+		var dodge_direction := input.movement_vector.normalized()
+		if dodge_direction == Vector3.ZERO:
+			# If no movement input, use facing direction
+			dodge_direction = -state.facing.z
+		else:
+			# Project movement direction onto ground plane
+			dodge_direction = dodge_direction - state.facing.y * dodge_direction.dot(state.facing.y)
+			dodge_direction = dodge_direction.normalized()
+
+		# Apply the dodge impulse
+		apply_central_impulse(dodge_direction * parameters.dodge_impulse * mass)
+
+		# Add animation hook - set a parameter that can be used in the animation tree
+		pass
+
+		print("Dodged with impulse: ", dodge_direction * parameters.dodge_impulse)

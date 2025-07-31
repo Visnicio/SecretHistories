@@ -47,6 +47,7 @@ var shard_has_spawned = false    # Tracks if the shard has spawned yet, so only 
 @onready var local_settings : SettingsClass = %LocalSettings
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
 @onready var load_screen: LoadScreen = $Loading
+@onready var screen_filters: ScreenFilters = $ScreenFilters
 
 #--- private variables - order: export > normal var > onready -------------------------------------
 
@@ -82,10 +83,10 @@ func _ready():
 
 
 func _input(event):
-	if Input.is_action_just_pressed("debug_level_down"):
+	if Input.is_action_just_pressed("debug_level_up"):
 		if current_floor_level != HIGHEST_FLOOR_LEVEL:
 			_on_Events_up_staircase_used()
-	if Input.is_action_just_pressed("debug_level_up"):
+	if Input.is_action_just_pressed("debug_level_down"):
 		if current_floor_level != LOWEST_FLOOR_LEVEL:
 			_on_Events_down_staircase_used()
 
