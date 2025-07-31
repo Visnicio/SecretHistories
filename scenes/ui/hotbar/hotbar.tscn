@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=3 uid="uid://cc53beeb4yjce"]
 
 [ext_resource type="PackedScene" uid="uid://lfp017c611je" path="res://scenes/ui/hotbar/hotbar_slot.tscn" id="1"]
-[ext_resource type="Script" path="res://scenes/ui/hotbar/hotbar.gd" id="1_c55wd"]
-[ext_resource type="Script" path="res://scenes/ui/hotbar/hotbar_slot.gd" id="2"]
+[ext_resource type="Script" uid="uid://cle7d3b1jbgpf" path="res://scenes/ui/hotbar/hotbar.gd" id="1_c55wd"]
+[ext_resource type="Script" uid="uid://qyryh6tmhriy" path="res://scenes/ui/hotbar/hotbar_slot.gd" id="2"]
 
 [sub_resource type="StyleBoxFlat" id="2"]
 content_margin_left = 4.0

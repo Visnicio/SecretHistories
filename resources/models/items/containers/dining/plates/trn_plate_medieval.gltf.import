@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cj6unq8kmkqnr"
+uid="uid://cf1c4gc7cmfrw"
 path="res://.godot/imported/trn_plate_medieval.gltf-989b52edc943fec81c77c682ee016c24.scn"
 
 [deps]
@@ -18,10 +18,7 @@ nodes/root_name=""
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
-<<<<<<< HEAD
-=======
 nodes/use_node_type_suffixes=true
->>>>>>> stewieremote/new_character
 meshes/ensure_tangents=true
 meshes/generate_lods=true
 meshes/create_shadow_meshes=true
@@ -36,5 +33,5 @@ animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
 _subresources={}
-gltf/naming_version=1
+gltf/naming_version=0
 gltf/embedded_image_handling=1

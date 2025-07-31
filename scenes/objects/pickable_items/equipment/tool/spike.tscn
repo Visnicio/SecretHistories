@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bvlwiff6qpqxu" path="res://scenes/objects/pickable_items/equipment/tool/spike.gd" id="2"]
 [ext_resource type="PackedScene" uid="uid://cxph1woam84mj" path="res://scenes/objects/pickable_items/equipment/tool/light-sources/_lantern_item.tscn" id="3"]
 [ext_resource type="Resource" uid="uid://ctul01kx63ail" path="res://resources/inventory/stackables/spikes_stack.tres" id="3_td37m"]
-[ext_resource type="PackedScene" uid="uid://bid0dfh83xlls" path="res://resources/models/items/tools/SM_Spike.glb" id="4_6gqk4"]
+[ext_resource type="PackedScene" uid="uid://clsutk6bnjyig" path="res://resources/models/items/tools/SM_Spike.glb" id="4_6gqk4"]
 [ext_resource type="Material" path="res://resources/models/gridmap/modular_doors/M_Wall_Metal.material" id="5_cdve3"]
 [ext_resource type="Script" uid="uid://cclp8d6j5ppi7" path="res://scenes/effects/mesh_instances.gd" id="6_a7ihs"]
 

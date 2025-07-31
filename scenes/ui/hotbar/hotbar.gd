@@ -28,7 +28,7 @@ func initialize_hotbar():
 	else:
 		inventory.init_inventory_for_player(11, 10)
 		
-	for i: int in inventory.hotbar_size:
+	for i: int in inventory.HOTBAR_SIZE:
 		var item = inventory.hotbar[i] as EquipmentItem
 		var item_name = item.item_name if item != null else ""
 		var item_amount = 1 if item != null else 0
@@ -64,7 +64,7 @@ func _on_hotbar_resized(new_size: int) -> void:
 			child.visible = false
 			positive_slots.append(child)
 
-	for i: int in inventory.hotbar_size:
+	for i: int in inventory.HOTBAR_SIZE:
 		var slot = $VBoxContainer.get_child(i)
 		slot.visible = true
 	pass

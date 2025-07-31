@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ob5k1kg6qurk" path="res://utils/debug_scenes/_base/standalone_generation_manager.gd" id="1"]
 [ext_resource type="MeshLibrary" uid="uid://b1txwxwvti23n" path="res://resources/mesh_libraries/modular_pieces.meshlib" id="2"]
-[ext_resource type="PackedScene" uid="uid://b2lftnajs8166" path="res://scenes/worlds/game_world.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://cc2wjy37jjyqq" path="res://scenes/worlds/game_world.tscn" id="3"]
 [ext_resource type="Script" uid="uid://o5v8567kg3bh" path="res://utils/debug_scenes/_base/top_down_camera.gd" id="4"]
 [ext_resource type="Script" uid="uid://cg3bgvk8xary3" path="res://utils/debug_scenes/_base/standalone_item_spawner.gd" id="5"]
 

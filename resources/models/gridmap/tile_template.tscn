@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://c77xyebs1b2ue"]
 
-[ext_resource type="PackedScene" uid="uid://t5nmsp1jgcpi" path="res://resources/models/gridmap/tile_template.glb" id="1"]
+[ext_resource type="PackedScene" uid="uid://dyhhbm4p5nx3w" path="res://resources/models/gridmap/tile_template.glb" id="1"]
 
 [sub_resource type="BoxShape3D" id="1"]
 size = Vector3(1.5, 1.5, 1.5)

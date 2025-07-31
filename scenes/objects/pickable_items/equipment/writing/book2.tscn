@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dbkaemnmhuvkx" path="res://scenes/objects/pickable_items/equipment/writing/_writing_item.tscn" id="1"]
 [ext_resource type="Script" uid="uid://cclp8d6j5ppi7" path="res://scenes/effects/mesh_instances.gd" id="2"]
-[ext_resource type="PackedScene" uid="uid://bgy7b4n4ulm0x" path="res://resources/models/items/writing/book2.glb" id="2_qrrqr"]
+[ext_resource type="PackedScene" uid="uid://bf51oxiqfwjwd" path="res://resources/models/items/writing/book2.glb" id="2_qrrqr"]
 
 [sub_resource type="ConvexPolygonShape3D" id="3"]
 points = PackedVector3Array(0.147611, 0.00539103, 0.122781, -0.152456, -0.00217156, -0.126861, -0.152456, -0.00217156, 0.125324, -0.0818377, 0.0180013, -0.1218, 0.137577, -0.011, -0.116376, 0.00133983, -0.0122609, 0.125324, -0.0818377, 0.0180013, 0.122781, 0.0997133, 0.0104357, -0.1218, 0.137577, -0.011, 0.114839, 0.00133983, -0.0122609, -0.126861, -0.130399, 0.01441, -0.111553, 0.147611, 0.00539103, -0.1218, -0.130399, 0.01441, 0.112321, 0.0997133, 0.0104357, 0.122781, -0.146356, 0.0052894, 0.12024, 0.14449, -0.00440909, 0.1206, -0.0768021, 0.0180013, -0.1218, -0.0768021, 0.0180013, 0.122781, -0.144583, 0.00525986, -0.1203, 0.142286, -0.00429892, -0.1203, 0.124921, 0.00791189, -0.1218, 0.124921, 0.00791189, 0.122781)

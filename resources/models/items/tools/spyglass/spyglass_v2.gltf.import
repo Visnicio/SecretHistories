@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cj41ym5ybragx"
+uid="uid://ds43j4esrwxgg"
 path="res://.godot/imported/spyglass_v2.gltf-40add26c7d5ed1cdb64c2874e8aaca34.scn"
 
 [deps]
@@ -13,24 +13,21 @@ dest_files=["res://.godot/imported/spyglass_v2.gltf-40add26c7d5ed1cdb64c2874e8aa
 
 [params]
 
-nodes/root_type="Node3D"
-nodes/root_name="Scene Root"
+nodes/root_type=""
+nodes/root_name=""
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
-<<<<<<< HEAD
-=======
 nodes/use_node_type_suffixes=true
->>>>>>> stewieremote/new_character
 meshes/ensure_tangents=true
 meshes/generate_lods=true
 meshes/create_shadow_meshes=true
-meshes/light_baking=0
-meshes/lightmap_texel_size=0.1
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
 meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
-animation/fps=15
+animation/fps=30
 animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false

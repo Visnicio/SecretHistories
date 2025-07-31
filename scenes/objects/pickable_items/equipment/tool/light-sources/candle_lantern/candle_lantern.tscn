@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://c3cbhjy3g2q7r" path="res://scenes/objects/pickable_items/equipment/consumable/disposable_lights/candle/fire_origin.gd" id="3"]
 [ext_resource type="Texture2D" uid="uid://i6ow4eq5xuw0" path="res://resources/models/items/tools/light_sources/candle_lantern/T_LanternCandle_BaseColor_png-T_LanternCandle_Opacity_png.png" id="3_6eaa6"]
 [ext_resource type="AudioStream" uid="uid://cjv6effcbo6rt" path="res://resources/sounds/light-sources/strike-match/508261__aerolus__match.mp3" id="4"]
-[ext_resource type="Texture2D" uid="uid://mt401061f3x1" path="res://resources/models/items/tools/light_sources/candle_lantern/T_LanternCandle_Metallic_png-T_LanternCandle_Roughness.png" id="4_mk046"]
+[ext_resource type="Texture2D" uid="uid://d2x7ym5sisfya" path="res://resources/models/items/tools/light_sources/candle_lantern/T_LanternCandle_Metallic_png-T_LanternCandle_Roughness.png" id="4_mk046"]
 [ext_resource type="AudioStream" uid="uid://bbusju33p65ex" path="res://resources/sounds/light-sources/blow-out/242867__reitanna__blowing-out-candle.ogg" id="5"]
 [ext_resource type="Texture2D" uid="uid://dla1eyfgnuolj" path="res://resources/models/items/tools/light_sources/candle_lantern/T_LanternCandle_Normal.png" id="5_sg1ev"]
 [ext_resource type="Script" uid="uid://cclp8d6j5ppi7" path="res://scenes/effects/mesh_instances.gd" id="6"]

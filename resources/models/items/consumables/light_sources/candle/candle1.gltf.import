@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bs0xj7bsteq6t"
+uid="uid://ckucpbeodd5ak"
 path="res://.godot/imported/candle1.gltf-40899c0ea6f5d2e50260b55f3cbce485.scn"
 
 [deps]
@@ -13,35 +13,25 @@ dest_files=["res://.godot/imported/candle1.gltf-40899c0ea6f5d2e50260b55f3cbce485
 
 [params]
 
-nodes/root_type="Node3D"
-nodes/root_name="Scene Root"
+nodes/root_type=""
+nodes/root_name=""
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
-<<<<<<< HEAD
-=======
 nodes/use_node_type_suffixes=true
->>>>>>> stewieremote/new_character
 meshes/ensure_tangents=true
 meshes/generate_lods=true
 meshes/create_shadow_meshes=true
-meshes/light_baking=0
-meshes/lightmap_texel_size=0.1
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
 meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
-animation/fps=15
+animation/fps=30
 animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
-_subresources={
-"materials": {
-"M_Candle1": {
-"use_external/enabled": true,
-"use_external/path": "res://scenes/objects/pickable_items/equipment/consumable/disposable_lights/candle/material/candle.tres"
-}
-}
-}
+_subresources={}
 gltf/naming_version=0
 gltf/embedded_image_handling=1

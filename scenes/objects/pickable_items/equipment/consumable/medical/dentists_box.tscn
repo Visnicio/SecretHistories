@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cclp8d6j5ppi7" path="res://scenes/effects/mesh_instances.gd" id="2"]
 [ext_resource type="AudioStream" uid="uid://chh2wsc7cblfv" path="res://resources/sounds/fabric/678008__mandy2__fabric-rubbing.mp3" id="4"]
 [ext_resource type="AudioStream" uid="uid://dd4kk0o7ikt72" path="res://resources/sounds/impacts/534956__joedinessound__arrow-wood-impact-single-archery-01.ogg" id="5"]
-[ext_resource type="PackedScene" uid="uid://bjts1it12rtdb" path="res://resources/models/items/consumables/medical/dentist_box/dentist_box.glb" id="6"]
+[ext_resource type="PackedScene" uid="uid://blve2besojdb0" path="res://resources/models/items/consumables/medical/dentist_box/dentist_box.glb" id="6"]
 
 [node name="DentistsBox" instance=ExtResource("1")]
 mass = 5.0

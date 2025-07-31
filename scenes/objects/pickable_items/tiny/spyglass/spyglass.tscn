@@ -4,8 +4,8 @@
 [ext_resource type="Resource" uid="uid://qyjg50r7tj47" path="res://resources/tiny_items/spyglass.tres" id="4"]
 [ext_resource type="Texture2D" uid="uid://d3b2xxx5gvfia" path="res://resources/models/items/tools/spyglass/T_Spyglass_Albedo.png" id="4_tdte3"]
 [ext_resource type="AudioStream" uid="uid://brqutfhvylb5s" path="res://resources/sounds/impacts/metal_and_gun/675009__sertonin__rifle-dropped-on-floor-3.ogg" id="5"]
-[ext_resource type="Texture2D" uid="uid://bp34q0uujjq3d" path="res://resources/models/items/tools/spyglass/T_Spyglass_Metallic_png-T_Spyglass_Roughness_png.png" id="5_3o2dl"]
-[ext_resource type="Texture2D" uid="uid://xkbhbrfsgdu7" path="res://resources/models/items/tools/spyglass/T_Spyglass_Normal.png" id="6_cxwyh"]
+[ext_resource type="Texture2D" uid="uid://cbfu8nnf66nsw" path="res://resources/models/items/tools/spyglass/T_Spyglass_Metallic_png-T_Spyglass_Roughness_png.png" id="5_3o2dl"]
+[ext_resource type="Texture2D" uid="uid://i5y8gldycpl1" path="res://resources/models/items/tools/spyglass/T_Spyglass_Normal.png" id="6_cxwyh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2cxy7"]
 resource_name = "M_Spyglass"

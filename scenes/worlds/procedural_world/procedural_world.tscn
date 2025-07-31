@@ -1,6 +1,6 @@
 [gd_scene load_steps=32 format=3 uid="uid://d1lbexonric4u"]
 
-[ext_resource type="PackedScene" uid="uid://b2lftnajs8166" path="res://scenes/worlds/game_world.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://cc2wjy37jjyqq" path="res://scenes/worlds/game_world.tscn" id="1"]
 [ext_resource type="Script" uid="uid://ckjgf5qsg358a" path="res://scenes/worlds/procedural_world/procedural_world.gd" id="2"]
 [ext_resource type="Script" uid="uid://dr7u05qy82dya" path="res://scenes/worlds/world_gen/generation_steps/generate_room_graph.gd" id="3"]
 [ext_resource type="Script" uid="uid://e2hqgpyka75d" path="res://scenes/worlds/world_gen/generation_steps/generate_room_pillars.gd" id="4"]

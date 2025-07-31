@@ -37,7 +37,7 @@ signal unequip_offhand
 signal hotbar_resized(new_size: int)
 
 ## 0 is the first slot (1), 10 is the empty_hands slot
-var hotbar_size : int = 11
+var HOTBAR_SIZE : int = 11
 
 # Items tracked exclusively by amount, don't contribute to weight,
 # don't show in hotbar
@@ -699,6 +699,6 @@ func _auto_equip_item(item: EquipmentItem, target_slot: int) -> bool:
 func init_inventory_for_player(inventory_size: int, hands_free_slot: int) -> void:
 	hands_free_slot = hands_free_slot
 	hotbar.resize(inventory_size)
-	hotbar_size = inventory_size
+	HOTBAR_SIZE = inventory_size
 	hotbar_resized.emit(inventory_size)
 	pass
