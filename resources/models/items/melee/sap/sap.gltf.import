@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://xxvhs1552b21"
-path="res://.godot/imported/sap.gltf-8d0780f4ef2e67d932f91a8cfa4e2a3c.scn"
+valid=false
 
 [deps]
 
 source_file="res://resources/models/items/melee/sap/sap.gltf"
-dest_files=["res://.godot/imported/sap.gltf-8d0780f4ef2e67d932f91a8cfa4e2a3c.scn"]
 
 [params]
 
@@ -18,6 +17,10 @@ nodes/root_name="Scene Root"
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
+<<<<<<< HEAD
+=======
+nodes/use_node_type_suffixes=true
+>>>>>>> stewieremote/new_character
 meshes/ensure_tangents=true
 meshes/generate_lods=true
 meshes/create_shadow_meshes=true

@@ -17,6 +17,10 @@ nodes/root_name=""
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
+<<<<<<< HEAD
+=======
+nodes/use_node_type_suffixes=true
+>>>>>>> stewieremote/new_character
 meshes/ensure_tangents=true
 meshes/generate_lods=true
 meshes/create_shadow_meshes=true
